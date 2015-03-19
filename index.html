@@ -6,9 +6,15 @@
 
     <body>
         <script>
-                d3.csv("http://127.0.0.1:8000/Lifetime_hitdata.txt", function(data) {
+                d3.csv("http://127.0.0.1:8000/muonlevensduur.csv", function(data) {
+                    var map = data.map( function(i) { return parseFloat(i.lifetime); })
+                    console.log(map)
 
-                    console.log(data)
+                    var histogram = d3.layout.histogram()
+                        .bins(10)
+                        (map)
+
+                    console.log(histogram)
             })
 
         </script>
