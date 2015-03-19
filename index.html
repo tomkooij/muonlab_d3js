@@ -8,14 +8,30 @@
         <script>
                 d3.csv("http://127.0.0.1:8000/muonlevensduur.csv", function(data) {
                     var map = data.map( function(i) { return parseFloat(i.lifetime); })
-                    console.log(map)
 
                     var histogram = d3.layout.histogram()
                         .bins(10)
-                        (map)
+                        (map);
 
                     console.log(histogram)
-            })
+
+                    var canvas = d3.select("body").append("svg")
+                        .attr("width", 500)
+                        .attr("height", 500);
+
+                    var bars = canvas.selectAll(".bar")
+                        .data(histogram)
+                        .enter()
+                        .append("g");
+
+                    bars.append("rect")
+                        .attr("x", function (d) { return d.x / 10; })
+                        .attr("y", 0)
+                        .attr("width", function (d) { return d.dx / 5; })
+                        .attr("height", function (d) { return d.y; })
+                        .attr("fill", "steelblue")
+
+                })
 
         </script>
     </body>
