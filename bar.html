@@ -58,13 +58,15 @@ var chart = d3.select(".chart")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 var global_data;
-
-d3.csv("muonlevensduur.csv", type, update);
+// hier moet een queue()
+d3.csv("muonlevensduur.csv")
+    .row(function(d) { return {timestamp: +d.timestamp, lifetime: +d.lifetime}; })
+    .get(function(error, rows) { global_data = rows;
+});
 
 function update(err, data) {
     var map = data.map( function(i) { return parseFloat(i.lifetime); });
-
-    global_data = data;
+    console.log(map);
 
     var histogram = d3.layout.histogram()
         .bins(10)
@@ -115,7 +117,7 @@ function type(d) {
 }
 
 function update_graph() {
-    global_data = global_data.slice(1,400);
+    global_data = global_data.splice(0,Math.ceil(global_data.length / 2));
     console.log(global_data);
     update({}, global_data)
 }
