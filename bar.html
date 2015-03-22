@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+<script src='http://d3js.org/d3.v3.min.js'></script>
+</head>
+
+<style>
+
+.bar {
+  fill: steelblue;
+}
+
+.axis text {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  display: none;
+}
+
+</style>
+<body>
+Hello world!
+<svg class="chart"></svg>
+<script>
+
+var margin = {top: 20, right: 30, bottom: 30, left: 40},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+var x = d3.scale.linear()
+    .range([0, width]);
+
+var y = d3.scale.linear()
+    .range([height, 0]);
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left");
+
+var chart = d3.select(".chart")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+d3.csv("muonlevensduur.csv", function(data) {
+    var map = data.map( function(i) { return parseFloat(i.lifetime); })
+
+    var histogram = d3.layout.histogram()
+        .bins(10)
+        (map);
+
+    console.log(histogram);
+
+    x.domain([0,d3.max(map)]);
+    y.domain([0,d3.max(histogram.map(function(i) {return i.length; }))]);
+
+    chart.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
+
+    chart.append("g")
+        .attr("class", "y axis")
+        .call(yAxis);
+
+    console.log(x(2));
+    console.log(y(1500));
+
+    chart.selectAll(".bar")
+        .data(histogram)
+        .enter().append("rect")
+            .attr("class", "bar")
+            .attr("x", function (d) { return x(d.x); })
+            .attr("y", 0)
+            .attr("width", function (d) { return x(d.dx); })
+            .attr("height", function (d) { return y(d.y); });
+
+});
+</script>
