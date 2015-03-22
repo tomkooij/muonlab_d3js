@@ -81,7 +81,7 @@ d3.csv("muonlevensduur.csv", function(data) {
     console.log(y(1500));
 
     chart.selectAll(".bar")
-        .data(histogram)
+        .data(histogram, function(d) { return d.length; })
         .enter().append("rect")
             .attr("class", "bar")
             .attr("x", function (d) { return x(d.x); })
