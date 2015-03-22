@@ -28,8 +28,8 @@
 
 </style>
 <body>
-Press me to update data:
-<button onclick="update_graph()">Update!</button>
+Replay events at >>100x speed:
+<button onclick="animateGraph()">Replay!</button>
 <svg class="chart"></svg>
 <script>
 
@@ -57,42 +57,47 @@ var chart = d3.select(".chart")
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-// hack for graph_updata
-var timervalue = 0;
-
 var global_data;
-// hier moet een queue()
+
 d3.csv("muonlevensduur.csv")
     .row(function(d) { return {timestamp: +d.timestamp, lifetime: +d.lifetime}; })
     .get(function(error, rows) { global_data = rows;
+
+    // na inlezen:
+    update({}, global_data);
+
 });
 
 function update(err, data) {
+
+    // selecteer alleen de lifetime data als array
     var map = data.map( function(i) { return parseFloat(i.lifetime); });
     console.log(map);
 
+    // maak histogram
     var histogram = d3.layout.histogram()
         .bins(10)
         (map);
-
     console.log(histogram);
 
+    // schaal
     x.domain([0,d3.max(map)]);
     y.domain([0,d3.max(histogram.map(function(i) {return i.length; }))]);
 
-    // Remove previous axes:
+    // verwijder de oude assen van de eventuele vorige update
     chart.select(".y.axis").remove(); // for updates
     chart.select(".x.axis").remove();
 
+    // assen
     chart.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")")
         .call(xAxis);
-
     chart.append("g")
         .attr("class", "y axis")
         .call(yAxis);
 
+    // bar chart
     var bar = chart.selectAll(".bar")
         .data(histogram, function(d) { return d.length; })
 
@@ -114,15 +119,25 @@ function update(err, data) {
             // first added from "enter()".
 };
 
-function type(d) {
-    d.value = +d.value;
-    return d;
-}
 
-function update_graph() {
-    timervalue += 2; // add items
-    dataset = global_data.slice(0,timervalue);
-    console.log(dataset);
-    update({}, dataset)
-}
+/*
+animateGraph
+replay the events at >>100x speed
+*/
+
+// t is de tijdstap voor de "animatie"
+var t = 0;
+function animateGraph() {
+
+    // repeat until...
+    (function repeat(){
+        t += 1;
+        console.log(t);
+        dataset = global_data.slice(0,t);
+        update({},dataset);
+        setTimeout(repeat, 100);
+    })();
+};
+
+
 </script>
