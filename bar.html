@@ -28,7 +28,7 @@
 
 </style>
 <body>
-Hello world!
+Press me to update data:
 <button onclick="update_graph()">Update!</button>
 <svg class="chart"></svg>
 <script>
@@ -56,6 +56,9 @@ var chart = d3.select(".chart")
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+// hack for graph_updata
+var timervalue = 0;
 
 var global_data;
 // hier moet een queue()
@@ -117,8 +120,9 @@ function type(d) {
 }
 
 function update_graph() {
-    global_data = global_data.splice(0,Math.ceil(global_data.length / 2));
-    console.log(global_data);
-    update({}, global_data)
+    timervalue += 2; // add items
+    dataset = global_data.slice(0,timervalue);
+    console.log(dataset);
+    update({}, dataset)
 }
 </script>
