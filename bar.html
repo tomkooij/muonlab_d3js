@@ -28,9 +28,17 @@
 
 </style>
 <body>
+<div id="dataset">Muon lifetime dataset: 17-Nov-2011 (3000 events)</div>
+<p>
+<h2>muon lifetime histogram</h2>
+<svg class="chart"></svg>
+
+<div>
 Replay events at >>100x speed:
 <button onclick="animateGraph()">Replay!</button>
-<svg class="chart"></svg>
+</div>
+<!-- placeholder for event counter -->
+<div id="timestamp"></div>
 <script>
 
 var margin = {top: 20, right: 30, bottom: 30, left: 40},
@@ -40,8 +48,9 @@ var margin = {top: 20, right: 30, bottom: 30, left: 40},
 var x = d3.scale.linear()
     .range([0, width])
     .domain([0,2000]);
-    
+
 var y = d3.scale.linear()
+    .domain([0,600])
     .range([height, 0]);
 
 var xAxis = d3.svg.axis()
@@ -77,14 +86,14 @@ function update(err, data) {
 
     // maak histogram
     var histogram = d3.layout.histogram()
-        .bins([0,200,400,600,800,1000,1200,1400,1600,1800])
+        .bins([0,100,200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500,1600,1700,1800,1900,2000,2100])
         (map);
     histogram.pop(); // remove last bin. with "all exceeding"
     console.log(histogram);
 
     // schaal
 //    x.domain([0,d3.max(map)]);
-    y.domain([0,d3.max(histogram.map(function(i) {return i.length; }))]);
+//    y.domain([0,d3.max(histogram.map(function(i) {return i.length; }))]);
 
     // verwijder de oude assen van de eventuele vorige update
     chart.select(".y.axis").remove(); // for updates
@@ -101,13 +110,13 @@ function update(err, data) {
 
     // bar chart
     var bar = chart.selectAll(".bar")
-        .data(histogram, function(d) { return d.length; })
+        .data(histogram, function(d, i) { return d.length, i; })
 
     bar.enter().append("rect")
         .attr("class", "bar")
-        .attr("x", function (d) { return x(d.x); })
+        .attr("x", function (d) { return x(d.x)+1; })
         .attr("y", function (d) { return y(d.y); })
-        .attr("width", function (d) { return x(d.dx); })
+        .attr("width", function (d) { return x(d.dx-2)-2; })
         .attr("height", function (d) { return height-y(d.y); });
     // removed data:
     bar.exit().remove();
@@ -129,14 +138,16 @@ replay the events at >>100x speed
 // t is de tijdstap voor de "animatie"
 var t = 0;
 function animateGraph() {
-
+    // rescale y-axis
+    y.domain([0,100]);
     // repeat until...
     (function repeat(){
         t += 1;
-        console.log(t);
+        var TimeStamp = document.getElementById("timestamp");
+        TimeStamp.innerHTML = "event = "+t;
         dataset = global_data.slice(0,t);
         update({},dataset);
-        setTimeout(repeat, 500);
+        setTimeout(repeat, 300);
     })();
 };
 
