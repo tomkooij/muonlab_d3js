@@ -29,6 +29,7 @@
 </style>
 <body>
 Hello world!
+<button onclick="update_graph()">Update!</button>
 <svg class="chart"></svg>
 <script>
 
@@ -56,8 +57,14 @@ var chart = d3.select(".chart")
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-d3.csv("muonlevensduur.csv", function(data) {
-    var map = data.map( function(i) { return parseFloat(i.lifetime); })
+var global_data;
+
+d3.csv("muonlevensduur.csv", type, update);
+
+function update(err, data) {
+    var map = data.map( function(i) { return parseFloat(i.lifetime); });
+
+    global_data = data;
 
     var histogram = d3.layout.histogram()
         .bins(10)
@@ -77,17 +84,35 @@ d3.csv("muonlevensduur.csv", function(data) {
         .attr("class", "y axis")
         .call(yAxis);
 
-    console.log(x(2));
-    console.log(y(1500));
-
-    chart.selectAll(".bar")
+    var bar = chart.selectAll(".bar")
         .data(histogram, function(d) { return d.length; })
-        .enter().append("rect")
-            .attr("class", "bar")
-            .attr("x", function (d) { return x(d.x); })
-            .attr("y", function (d) { return y(d.y); })
-            .attr("width", function (d) { return x(d.dx); })
-            .attr("height", function (d) { return height-y(d.y); });
 
-});
+    bar.enter().append("rect")
+        .attr("class", "bar")
+        .attr("x", function (d) { return x(d.x); })
+        .attr("y", function (d) { return y(d.y); })
+        .attr("width", function (d) { return x(d.dx); })
+        .attr("height", function (d) { return height-y(d.y); });
+    // removed data:
+    bar.exit().remove();
+    // updated data:
+    bar
+        .transition()
+        .duration(750)
+            .attr("y", function(d) { return y(d.y); })
+            .attr("height", function(d) { return height - y(d.y); });
+            // "x" and "width" will already be set from when the data was
+            // first added from "enter()".
+};
+
+function type(d) {
+    d.value = +d.value;
+    return d;
+}
+
+function update_graph() {
+    global_data = global_data.slice(1,400);
+    console.log(global_data);
+    update({}, global_data)
+}
 </script>
