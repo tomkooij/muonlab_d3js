@@ -76,7 +76,7 @@ function update(err, data) {
 
     // maak histogram
     var histogram = d3.layout.histogram()
-        .bins(10)
+        .bins(20)
         (map);
     console.log(histogram);
 
@@ -112,7 +112,6 @@ function update(err, data) {
     // updated data:
     bar
         .transition()
-        .duration(750)
             .attr("y", function(d) { return y(d.y); })
             .attr("height", function(d) { return height - y(d.y); });
             // "x" and "width" will already be set from when the data was
@@ -135,7 +134,7 @@ function animateGraph() {
         console.log(t);
         dataset = global_data.slice(0,t);
         update({},dataset);
-        setTimeout(repeat, 100);
+        setTimeout(repeat, 500);
     })();
 };
 
