@@ -53,7 +53,7 @@ var yAxis = d3.svg.axis()
 var chart = d3.select(".chart")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
-  .append("g")
+    .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 d3.csv("muonlevensduur.csv", function(data) {
@@ -85,9 +85,9 @@ d3.csv("muonlevensduur.csv", function(data) {
         .enter().append("rect")
             .attr("class", "bar")
             .attr("x", function (d) { return x(d.x); })
-            .attr("y", 0)
+            .attr("y", function (d) { return y(d.y); })
             .attr("width", function (d) { return x(d.dx); })
-            .attr("height", function (d) { return y(d.y); });
+            .attr("height", function (d) { return height-y(d.y); });
 
 });
 </script>
