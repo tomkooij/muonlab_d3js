@@ -136,7 +136,8 @@ replay the events at >>100x speed
 */
 
 // t is de tijdstap voor de "animatie"
-var t = 0;
+var t = 0, index = 0;
+
 function animateGraph() {
     // rescale y-axis
     y.domain([0,100]);
@@ -145,8 +146,10 @@ function animateGraph() {
     // repeat until...
     (function repeat(){
         t += 1;
-        TimeStamp.innerHTML = "event = "+t;
-        dataset = global_data.slice(0,t);
+        TimeStamp.innerHTML = "time = "+t+" s. Event: "+index;
+        // find last index with timestamp < t
+        index = t;
+        dataset = global_data.slice(0,index);
         updateGraph(dataset);
         setTimeout(repeat, 300);
     })();
