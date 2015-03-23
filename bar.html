@@ -140,10 +140,11 @@ var t = 0;
 function animateGraph() {
     // rescale y-axis
     y.domain([0,100]);
+
+    var TimeStamp = document.getElementById("timestamp");
     // repeat until...
     (function repeat(){
         t += 1;
-        var TimeStamp = document.getElementById("timestamp");
         TimeStamp.innerHTML = "event = "+t;
         dataset = global_data.slice(0,t);
         update({},dataset);
