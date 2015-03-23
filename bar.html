@@ -108,10 +108,22 @@ function updateGraph(data) {
     chart.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")")
-        .call(xAxis);
+        .call(xAxis)
+      .append("text")
+        .attr("x", 900)
+        .attr("y", 20)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text("Lifetime (ns)");
     chart.append("g")
         .attr("class", "y axis")
-        .call(yAxis);
+        .call(yAxis)
+      .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text("Counts");
 
     // bar chart
     var bar = chart.selectAll(".bar")
@@ -149,6 +161,11 @@ var t = 0, index = 0, new_lifetime = "No events.", timerOn = true, simSpeed = 10
 function animateGraph() {
     // rescale y-axis
     y.domain([0,100]);
+
+    t = 0; // restart
+    index = 0;
+    new_lifetime = "No events."
+    updateGraph(global_data.slice(0,0)) // enter empty dataset
 
     var TimeStamp = document.getElementById("timestamp");
     // repeat until...
