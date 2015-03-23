@@ -7,7 +7,7 @@
 
 <style>
 
-.bar {
+.ditwaseerst_dotbar {
   fill: steelblue;
 }
 
@@ -30,6 +30,9 @@
 <body>
 <div id="dataset">Muon lifetime dataset: 17-Nov-2011 (3000 events)</div>
 <p>
+<!-- placeholder for event counter -->
+<b><div id="timestamp"></div></b>
+<p>
 <h2>muon lifetime histogram</h2>
 <svg class="chart"></svg>
 
@@ -37,8 +40,7 @@
 Replay events at >>100x speed:
 <button onclick="animateGraph()">Replay!</button>
 </div>
-<!-- placeholder for event counter -->
-<div id="timestamp"></div>
+
 <script>
 
 var margin = {top: 20, right: 30, bottom: 30, left: 40},
@@ -81,15 +83,14 @@ d3.csv("muonlevensduur.csv")
 function updateGraph(data) {
 
     // selecteer alleen de lifetime data als array
-    var map = data.map( function(i) { return parseFloat(i.lifetime); });
-    //console.log(map);
+    var map = data.map( function(i) { return +i.lifetime; });
 
     // maak histogram
     var histogram = d3.layout.histogram()
         .bins(d3.range(0,12000,500))
         (map);
-    // histogram.pop(); // remove last bin. with "all exceeding"
-    // console.log(histogram);
+
+    console.log(histogram);
 
     // schaal
 //    x.domain([0,d3.max(map)]);
@@ -112,19 +113,25 @@ function updateGraph(data) {
     var bar = chart.selectAll(".bar")
         .data(histogram, function(d, i) { return d.length, i; })
 
+    // new lifetime is the bin that needs to be a different colour
+    console.log(new_lifetime);
+
     bar.enter().append("rect")
         .attr("class", "bar")
         .attr("x", function (d) { return x(d.x)+1; })
         .attr("y", function (d) { return y(d.y); })
         .attr("width", function (d) { return x(d.dx-2)-2; })
-        .attr("height", function (d) { return height-y(d.y); });
+        .attr("height", function (d) { return height-y(d.y); })
+        .attr("fill", "steelblue");
     // removed data:
     bar.exit().remove();
     // updated data:
     bar
         .transition()
             .attr("y", function(d) { return y(d.y); })
-            .attr("height", function(d) { return height - y(d.y); });
+            .attr("height", function(d) { return height - y(d.y); })
+
+            .attr("fill", function(d) { if ((d.x+500 > new_lifetime) && ((d.x) < new_lifetime)) { return "red" } else {return "steelblue"}; } );
             // "x" and "width" will already be set from when the data was
             // first added from "enter()".
 };
@@ -136,7 +143,7 @@ replay the events at >>100x speed
 */
 
 // t is de tijdstap voor de "animatie"
-var t = 0, index = 0;
+var t = 100, index = 0, new_lifetime;
 
 function animateGraph() {
     // rescale y-axis
@@ -146,15 +153,16 @@ function animateGraph() {
     // repeat until...
     (function repeat(){
         t += 1;
-        TimeStamp.innerHTML = "time = "+t+" s. Event: "+index;
+        TimeStamp.innerHTML = "time = "+t+" s. Event #"+index+". Current event lifetime = "+new_lifetime+" ns.";
         // is the event timestamp "before" the current time?
         //  update graph and queue next event
         if (global_data[index]["timestamp"] < t) {
             index += 1;
+            new_lifetime = global_data[index]["lifetime"];
             dataset = global_data.slice(0,index);
             updateGraph(dataset);
         };
-        setTimeout(repeat, 10);
+        setTimeout(repeat, 100);
     })();
 };
 
