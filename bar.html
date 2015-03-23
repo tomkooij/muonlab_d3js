@@ -139,7 +139,7 @@ replay the events at >>100x speed
 */
 
 // t is de tijdstap voor de "animatie"
-var t = 0, index = 0, new_lifetime, timerOn = true;
+var t = 0, index = 0, new_lifetime = "No events.", timerOn = true;
 
 function animateGraph() {
     // rescale y-axis
@@ -154,8 +154,8 @@ function animateGraph() {
             // is the event timestamp "before" the current time?
             //  update graph and queue next event
             if (global_data[index]["timestamp"] < t) {
-                index += 1;
                 new_lifetime = global_data[index]["lifetime"];
+                index += 1;
                 dataset = global_data.slice(0,index);
                 updateGraph(dataset);
             };
