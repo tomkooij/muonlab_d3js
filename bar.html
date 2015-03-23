@@ -82,7 +82,7 @@ function updateGraph(data) {
 
     // selecteer alleen de lifetime data als array
     var map = data.map( function(i) { return parseFloat(i.lifetime); });
-    console.log(map);
+    //console.log(map);
 
     // maak histogram
     var histogram = d3.layout.histogram()
@@ -147,11 +147,14 @@ function animateGraph() {
     (function repeat(){
         t += 1;
         TimeStamp.innerHTML = "time = "+t+" s. Event: "+index;
-        // find last index with timestamp < t
-        index = t;
-        dataset = global_data.slice(0,index);
-        updateGraph(dataset);
-        setTimeout(repeat, 300);
+        // is the event timestamp "before" the current time?
+        //  update graph and queue next event
+        if (global_data[index]["timestamp"] < t) {
+            index += 1;
+            dataset = global_data.slice(0,index);
+            updateGraph(dataset);
+        };
+        setTimeout(repeat, 10);
     })();
 };
 
