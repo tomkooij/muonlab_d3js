@@ -30,17 +30,16 @@
 <body>
 <div id="dataset">Muon lifetime dataset: 17-Nov-2011 (3000 events)</div>
 <p>
+<h2>muon lifetime histogram</h2>
+<svg class="chart"></svg>
 <!-- placeholder for event counter -->
 <b><div id="timestamp"></div></b>
 <p>
-<h2>muon lifetime histogram</h2>
-<svg class="chart"></svg>
-
 <div>
 Replay events at >10x speed:
 <button onclick="animateGraph()">Replay!</button>
+<button id="pause" onclick="toggle(this)">Pause</button>
 </div>
-
 <script>
 
 var margin = {top: 20, right: 30, bottom: 30, left: 40},
@@ -90,7 +89,7 @@ function updateGraph(data) {
         .bins(d3.range(0,12000,500))
         (map);
 
-    console.log(histogram);
+    //console.log(histogram);
 
     // schaal
 //    x.domain([0,d3.max(map)]);
@@ -140,7 +139,7 @@ replay the events at >>100x speed
 */
 
 // t is de tijdstap voor de "animatie"
-var t = 0, index = 0, new_lifetime;
+var t = 0, index = 0, new_lifetime, timerOn = true;
 
 function animateGraph() {
     // rescale y-axis
@@ -149,21 +148,40 @@ function animateGraph() {
     var TimeStamp = document.getElementById("timestamp");
     // repeat until...
     (function repeat(){
-        t += 1;
-        TimeStamp.innerHTML = "time = "+t+" s. Event #"+index+". Current event lifetime = "+new_lifetime+" ns.";
-        // is the event timestamp "before" the current time?
-        //  update graph and queue next event
-        if (global_data[index]["timestamp"] < t) {
-            console.log("redrawing!");
-            console.log(t, index, new_lifetime);
-            index += 1;
-            new_lifetime = global_data[index]["lifetime"];
-            dataset = global_data.slice(0,index);
-            updateGraph(dataset);
+        if (timerOn) {
+            t += 1;
+            TimeStamp.innerHTML = "time = "+t+" s. Event #"+index+". Current event lifetime = "+new_lifetime+" ns.";
+            // is the event timestamp "before" the current time?
+            //  update graph and queue next event
+            if (global_data[index]["timestamp"] < t) {
+                index += 1;
+                new_lifetime = global_data[index]["lifetime"];
+                dataset = global_data.slice(0,index);
+                updateGraph(dataset);
+            };
         };
-        setTimeout(repeat,100);
+        setTimeout(repeat,80);
     })();
 };
+
+// pause doesn't stop
+// just set flags to indicate that these two elements should stop/start:
+function toggle(button)
+{
+    timerOn = !timerOn; // toggle timer flag
+    console.log(button.innerHTML);
+    switch(button.innerHTML)
+    {
+        case "Pause":
+            button.innerHTML = "Resume";
+            break;
+        case "Resume":
+            button.innerHTML = "Pause";
+            break;
+    }
+};
+
+
 
 
 </script>
