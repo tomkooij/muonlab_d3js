@@ -36,7 +36,12 @@
 <b><div id="timestamp"></div></b>
 <p>
 <div>
-Replay events at >10x speed:
+Replay events at <select id="speed" onchange="changeSpeed()">
+    <option value="10">10x</option>
+    <option value="100">100x</option>
+    <option value="1">1x</option>
+</select> speed:
+
 <button onclick="animateGraph()">Replay!</button>
 <button id="pause" onclick="toggle(this)">Pause</button>
 </div>
@@ -139,7 +144,7 @@ replay the events at >>100x speed
 */
 
 // t is de tijdstap voor de "animatie"
-var t = 0, index = 0, new_lifetime = "No events.", timerOn = true;
+var t = 0, index = 0, new_lifetime = "No events.", timerOn = true, simSpeed = 10;
 
 function animateGraph() {
     // rescale y-axis
@@ -160,7 +165,7 @@ function animateGraph() {
                 updateGraph(dataset);
             };
         };
-        setTimeout(repeat,80);
+        setTimeout(repeat,800/simSpeed);
     })();
 };
 
@@ -180,6 +185,12 @@ function toggle(button)
             break;
     }
 };
+
+function changeSpeed()
+{
+    simSpeed = document.getElementById("speed").value;
+    console.log(simSpeed);
+}
 
 
 
