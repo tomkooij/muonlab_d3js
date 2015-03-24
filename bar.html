@@ -136,7 +136,7 @@ function updateGraph(data) {
             .attr("y", function(d) { return y(d.y); })
             .attr("height", function(d) { return height - y(d.y); })
 
-            .attr("fill", function(d) { if ((d.x+d.dx > new_lifetime) && ((d.x) < new_lifetime)) { return "red" } else {return "steelblue"}; } );
+            .attr("fill", function(d) { if ((d.x+d.dx > new_lifetime) && ((d.x) <= new_lifetime)) { return "red" } else {return "steelblue"}; } );
             // "x" and "width" will already be set from when the data was
             // first added from "enter()".
 };
