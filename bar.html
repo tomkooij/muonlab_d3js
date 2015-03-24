@@ -119,8 +119,16 @@ function updateGraph(data) {
 
     // bar chart
     var bar = chart.selectAll(".bar")
+        // let op: hier moet echt function(d,i) gebruikt worden: (data, key)
         .data(histogram, function(d, i) { return d.length, i; })
-
+    // update()
+    bar
+        .transition()
+        .attr("y", function(d) { return y(d.y); })
+        .attr("height", function(d) { return height - y(d.y); })
+        // color the last changed (updated) bin red
+        .attr("fill", function(d) { if ((d.x+d.dx > new_lifetime) && ((d.x) <= new_lifetime)) { return "red" } else {return "steelblue"}; } );
+    // enter()
     bar.enter().append("rect")
         .attr("class", "bar")
         .attr("x", function (d) { return x(d.x)+1; })
@@ -130,15 +138,6 @@ function updateGraph(data) {
         .attr("fill", "steelblue");
     // removed data:
     bar.exit().remove();
-    // updated data:
-    bar
-        .transition()
-            .attr("y", function(d) { return y(d.y); })
-            .attr("height", function(d) { return height - y(d.y); })
-
-            .attr("fill", function(d) { if ((d.x+d.dx > new_lifetime) && ((d.x) <= new_lifetime)) { return "red" } else {return "steelblue"}; } );
-            // "x" and "width" will already be set from when the data was
-            // first added from "enter()".
 };
 
 
@@ -200,8 +199,5 @@ function changeSpeed()
 {
     simSpeed = document.getElementById("speed").value;
 }
-
-
-
 
 </script>
