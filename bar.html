@@ -20,7 +20,13 @@
 
 </style>
 <body>
-<div id="dataset">Muon lifetime dataset: 17-Nov-2011 (3000 events)</div>
+<div id="choosedataset">
+Muon lifetime dataset:
+<select id="dataset" onchange="changeDataset()">
+    <option value="1">17-Nov-2011 (3000 events)</option>
+    <option value="2">debug (1500, 1500, 1500..)</option>
+</select> (dataset will not change when animation is running)
+</div>
 <p>
 <h2>muon lifetime histogram</h2>
 <svg class="chart"></svg>
@@ -69,11 +75,20 @@ var global_data;
 
 d3.csv("muonlevensduur.csv")
     .row(function(d) { return {timestamp: +d.timestamp, lifetime: +d.lifetime}; })
-    .get(function(error, rows) { global_data = rows;
+    .get(function(error, rows) { lifetime_data = rows;
+
+    global_data = lifetime_data;
 
     // na inlezen:
     updateGraph(global_data);
+});
 
+// laadt ook de debug data
+d3.csv("debug.csv")
+.row(function(d) { return {timestamp: +d.timestamp, lifetime: +d.lifetime}; })
+.get(function(error, rows) { debug_data = rows;
+
+    // na inlezen:
 });
 
 function updateGraph(data) {
@@ -147,9 +162,10 @@ replay the events
 */
 
 // t is de tijdstap voor de "animatie"
-var t , index , new_lifetime , timerOn = true, simSpeed = 10;
+var t , index , new_lifetime , timerOn = false, simSpeed = 10;
 
 function animateGraph() {
+
     // rescale y-axis
     y.domain([0,100]);
 
@@ -158,11 +174,15 @@ function animateGraph() {
     new_lifetime = "No events."
     updateGraph(global_data.slice(0,0)) // enter empty dataset
 
+    // start timer
+    timerOn = true;
+
     var TimeStamp = document.getElementById("timestamp");
     // repeat until...
     (function repeat(){
         if (timerOn) {
             t += 1;
+            // move this to updateGraph !!!
             TimeStamp.innerHTML = "time = "+t+" s. Event #"+index+". Current event lifetime = "+new_lifetime+" ns.";
             // is the event timestamp "before" the current time?
             //  update graph and queue next event
@@ -198,6 +218,28 @@ function changeSpeed()
 // handle dropdown simulation speed
 {
     simSpeed = document.getElementById("speed").value;
+}
+
+function changeDataset()
+{
+    if (timerOn) { return 0; } // do nothing if animation already running
+
+    switch(document.getElementById("dataset").value)
+    {
+        case "1":
+            global_data = lifetime_data;
+            break;
+        case "2":
+            global_data = debug_data;
+            break;
+    }
+    y.domain([0,600]); // reset scale
+    t = 0; // restart
+    index = 0;
+    new_lifetime = "No events."  // and update status line
+    // Stop/reset animation getdocumentbyid(button)=Pause.
+    updateGraph(global_data);
+
 }
 
 </script>
