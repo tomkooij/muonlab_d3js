@@ -7,10 +7,6 @@
 
 <style>
 
-.ditwaseerst_dotbar {
-  fill: steelblue;
-}
-
 .axis text {
   font: 10px sans-serif;
 }
@@ -20,10 +16,6 @@
   fill: none;
   stroke: #000;
   shape-rendering: crispEdges;
-}
-
-.x.axis path {
-  display: none;
 }
 
 </style>
@@ -144,7 +136,7 @@ function updateGraph(data) {
             .attr("y", function(d) { return y(d.y); })
             .attr("height", function(d) { return height - y(d.y); })
 
-            .attr("fill", function(d) { if ((d.x+500 > new_lifetime) && ((d.x) < new_lifetime)) { return "red" } else {return "steelblue"}; } );
+            .attr("fill", function(d) { if ((d.x+d.dx > new_lifetime) && ((d.x) < new_lifetime)) { return "red" } else {return "steelblue"}; } );
             // "x" and "width" will already be set from when the data was
             // first added from "enter()".
 };
@@ -152,11 +144,11 @@ function updateGraph(data) {
 
 /*
 animateGraph
-replay the events at >>100x speed
+replay the events
 */
 
 // t is de tijdstap voor de "animatie"
-var t = 0, index = 0, new_lifetime = "No events.", timerOn = true, simSpeed = 10;
+var t , index , new_lifetime , timerOn = true, simSpeed = 10;
 
 function animateGraph() {
     // rescale y-axis
@@ -186,8 +178,8 @@ function animateGraph() {
     })();
 };
 
-// pause doesn't stop
-// just set flags to indicate that these two elements should stop/start:
+// pause doesn't stop the repeating function
+// just set flag to stop updating
 function toggle(button)
 {
     timerOn = !timerOn; // toggle timer flag
@@ -204,9 +196,9 @@ function toggle(button)
 };
 
 function changeSpeed()
+// handle dropdown simulation speed
 {
     simSpeed = document.getElementById("speed").value;
-    console.log(simSpeed);
 }
 
 
